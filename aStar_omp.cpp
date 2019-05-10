@@ -26,6 +26,50 @@ struct neighbor {
 };
  
 typedef std::vector<std::vector<neighbor>> adjacency_list_t;
+
+
+/*
+ list of node weights
+         n0  n1  n2  n3  n4  n5  n6  n7  n8
+ gCost: [1, 3,  4,  2,  3,  5,  2,  1,   0]
+ hCost: [4, 3,  2,  3,  2,  1,  2,  1,   0]
+ 
+
+
+ Adjacency/Weight list:
+    n0: (n1, n3)
+    n1: (n0, n4, n2)
+    n2: (n1, n5)
+    n3: (n0, n4, n6)
+    n4: (n1, n3, n4, n5)
+    n5: (n2, n4, n8)
+    n6: (n3, n7, n8)
+    n7: (n4, n6)
+    n8: (n7, n5)
+
+ Weight List:
+    n0: (n1, n3)
+    n1: (n0, n4, n2)
+    n2: (n1, n5)
+    n3: (n0, n4, n6)
+    n4: (n1, n3, n4, n5)
+    n5: (n2, n4, n8)
+    n6: (n3, n7, n8)
+    n7: (n4, n6)
+    n8: (n7, n5)
+*/
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************/
  
  
 void aStarComputePaths(vertex_t source,
@@ -62,10 +106,11 @@ void aStarComputePaths(vertex_t source,
 
   		tid      = omp_get_thread_num();
     	nthreads = omp_get_num_threads(); 
+
     	first_vertex  =  (  tid       * nvertices) / nthreads;
     	last_vertex  =   (( tid + 1 ) * nvertices) / nthreads - 1;
 
-    	while(doneProcessingFlag > 0) {
+    	while(doneProcessingFlag != 0) {
 
     		if (!openSets[tid].empty()){
     			weight_t dist = openSets[tid].begin()->first;
@@ -113,12 +158,10 @@ std::list<vertex_t> aStarGetShortestPathTo(
         path.push_front(vertex);
     return path;
 }
- 
- 
-int main()
+
+
+void init(adjacency_list_t* adjacency_list)
 {
-    // remember to insert edges both ways for an undirected graph
-    adjacency_list_t adjacency_list(6);
     // 0 = a
     adjacency_list[0].push_back(neighbor(1, 7));
     adjacency_list[0].push_back(neighbor(2, 9));
@@ -143,6 +186,13 @@ int main()
     adjacency_list[5].push_back(neighbor(0, 14));
     adjacency_list[5].push_back(neighbor(2, 2));
     adjacency_list[5].push_back(neighbor(4, 9));
+}
+ 
+int main()
+{
+    // remember to insert edges both ways for an undirected graph
+    adjacency_list_t adjacency_list(6);
+    init(&adjacency_list);
  
     std::vector<weight_t> min_distance;
     std::vector<vertex_t> previous;
